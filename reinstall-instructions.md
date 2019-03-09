@@ -70,7 +70,7 @@ brew install wget
 * Install R packages from CRAN:
 
 ```
-install.packages(c("tydyverse","knitr","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor"))
+install.packages(c("tidyverse","knitr","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor"))
 ```
 
 * Install R packages from Bioc:

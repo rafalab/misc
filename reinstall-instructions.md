@@ -14,7 +14,7 @@
 
 * Turn off notification
  
-* Copy over ~/myDocumnets, ~/Dropbox/ ~/Music/ ~/Pictures/ ~/bin/ ~/Movies/
+* Copy over ~/myDocuments, ~/Dropbox/ ~/Music/ ~/Pictures/ ~/bin/ ~/Movies/
 files from old computer
 
 * Go to the “Keyboard” system preference and change shortcut for moving spaces to command-arrow
@@ -24,7 +24,7 @@ files from old computer
 	TextEdit > Preferences… > Uncheck “smart quotes” and “smart dashes”
 	In TextEdit, Edit > Substitutions > Uncheck “Smart Quotes” and “Smart Dashes”
 
-* Install chrome
+* Install Chrome
 
 * install iTerm
 
@@ -36,9 +36,9 @@ files from old computer
 
 * Install wget from http://rudix.org/packages/wget.html
 
-* Install R binaries. not sure if i have to do this. but RStudio might R.app to be in the Applicaton folder.
+* Install R binaries. not sure if i have to do this. but RStudio might R.app to be in the Application folder.
 
-* Optiona: install R from source
+* Optional: install R from source
 	- Install Java JDK from here: http://www.oracle.com/technetwork/java/javase/
 	- download gfortran from mac: https://gcc.gnu.org/wiki/GFortranBinaries#MacOS
 	- downloads/jdk8-downloads-2133151.html
@@ -53,7 +53,7 @@ files from old computer
 
 * Try to knit with RStudio (PDF) so it installs packages (e.g. knitr)
 
-* Install drop box
+* Install DropBox
 
 * Install R packages from CRAN:
 
@@ -73,7 +73,7 @@ BiocManager::install(c("genefilter","affy","SpikeIn","SpikeInSubset","limma","hg
 find ./ -name "*.[R|Rmd|Rpres]" -exec grep "library" {} \;
 ```
 
-* Install R packages from github:
+* Install R packages from GitHub:
 ```
 library(devtools)
 install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genomicsclass/GSE5859Subset","genomicsclass/GSE5859"))
@@ -82,7 +82,7 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 * Download and install Xquartz from http://xquartz.macosforge.org/landing/
 
 
-* Download and install microsoft office (ugh) search email for subject line "latest mac os and office"
+* Download and install Microsoft office (ugh) search email for subject line "latest mac OS and office"
 
 * Install emacs from http://emacsformacosx.com/
 
@@ -126,8 +126,9 @@ R CMD INSTALL rgeos_0.3-19.tar.gz --configure-args="--with-geos-config=/Library/
 ```
 
 * aspell for emacs
+```
 brew install aspell --with-all-langs
 (setq ispell-program-name "aspell") in .emacs
 ln -s /usr/local/Cellar/aspell/0.60.6.1/bin/aspell ~/bin/aspell
-
+```
 

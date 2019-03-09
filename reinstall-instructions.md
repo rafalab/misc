@@ -1,16 +1,15 @@
 # Step by step instruction to get a new Mac ready
 
-* Go to security and privacy and turn on file vault encrypt 
+* To encrypt computer: go to Security and Privacy in System Preferences and turn on File _Vault Encrypt_.
 
-* Allow apps to download from  “Anywhere”
+* Allow apps to download from  “Anywhere” or whatever the most liberal option is.
 
-* Change computer name in system preference. I call it macrafa
+* Change computer name in _Sharing_ in System Preferences. I call it macrafa.
 
-* Change system preferences to automatically hide dock
+* Change system preferences to automatically hide dock in _Dock_.
 
-* Go to mission control (f3) and add spaces (look up at the corner for + sign)
+* Go to mission control (F3) and add spaces (look up at the corner for + sign). I add three.
 
-* Optional: Change shortcut for spotlight to option-space (system preferences search for shortcut)
 
 * Turn off notification
  
@@ -28,14 +27,27 @@ files from old computer
 
 * install iTerm
 
-* Type git in terminal so mac installs Xtools etc…
-	type "brew install git-lfs"
-	type "git lfs install"
 
+
+* Type `git` in terminal so mac installs Xtools and other tools. 
+* Install homebrew with 
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+* Add git-lfs with:
+```
+brew install git-lfs
+git lfs install
+```
 * install 1password and backup from old files that are here: "~/Library/Application Support/1Password 4"
 
-* Install wget from http://rudix.org/packages/wget.html
+* Install wget using homebrew:
 
+```
+brew install wget
+```
 * Install R binaries. not sure if i have to do this. but RStudio might R.app to be in the Application folder.
 
 * Optional: install R from source
@@ -93,11 +105,6 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 * Download markdown-mode.el and put he  ~/myDocuments/misc ess dir
 	git clone https://github.com/vspinu/polymode.git in the ess dir
 
-* Install homebrew with 
-
-```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
 
 * The latest version of GNU Aspell is 0.60.6.1. Find it at ftp.gnu.org:/gnu/aspell
 

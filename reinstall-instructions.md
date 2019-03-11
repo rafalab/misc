@@ -1,4 +1,4 @@
-# Step by step instruction to get a new Mac ready
+# Steps I follow to to get my new Mac ready
 
 * To encrypt computer: go to Security and Privacy in System Preferences and turn on File _Vault Encrypt_.
 
@@ -70,7 +70,7 @@ brew install wget
 * Install R packages from CRAN:
 
 ```
-install.packages(c("tidyverse","knitr","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor"))
+install.packages(c("tidyverse","knitr","bookdown","blogdown","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor"))
 ```
 
 * Install R packages from Bioc:

@@ -132,7 +132,11 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 
 * Install printer with IP: 155.52.45.122
 
-* Make ririzarr owner of /usr/local for easy installation using brew sudo chown -R $USER /usr/local
+* Make ririzarr owner of /usr/local for easy installation using brew 
+
+```
+sudo chown -R $USER /usr/local
+```
 
 * Install rgdal from 
 http://www.compmath.com/blog/2010/07/installing-package-on-mac-os-x/

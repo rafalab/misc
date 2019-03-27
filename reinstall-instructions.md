@@ -72,7 +72,14 @@ brew install wget
 * Install R packages from CRAN:
 
 ```
-install.packages(c("tidyverse","knitr","bookdown","blogdown","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor"))
+install.packages(c("tidyverse","dslabs","knitr","bookdown","blogdown","devtools","RColorBrewer","class","caret","gplots","downloader","gganimate","ggrepel","gridExtra","animation","UsingR","matrixStats","XML","corpcor", "maps", "bindrcpp", "NHANES", "ggthemes", "ggridges","VennDiagram", "Lahman", "lpSolve", "tidytext", "gam", "randomForest", "Rborist"))
+```
+
+* Install R packages from CRAN for teaching purposes:
+
+
+```
+install.packages(c("dslabs", "Lahman", "scatterplot3d", "rafalib"))
 ```
 
 * Install R packages from Bioc:

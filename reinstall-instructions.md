@@ -1,4 +1,6 @@
-# Steps I follow to to get my new Mac ready
+# Steps I follow to to get my new Mac ready for data analysis
+
+Note this very specific to the way I work. Consider them suggestions rather than step-by-step instructions.
 
 * To encrypt computer: go to Security and Privacy in System Preferences and turn on File _Vault Encrypt_.
 
@@ -13,8 +15,8 @@
 
 * Turn off notification
  
-* Copy over ~/myDocuments, ~/Dropbox/ ~/Music/ ~/Pictures/ ~/bin/ ~/Movies/
-files from old computer
+* Copy over ~/myDocuments, ~/Dropbox/ ~/Music/ ~/Pictures/ ~/bin/ ~/Movies/, ~/.ssh
+files from old computer.
 
 * Go to the “Keyboard” system preference and change shortcut for moving spaces to command-arrow
 

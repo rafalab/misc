@@ -8,6 +8,11 @@ Note this very specific to the way I work. Consider them suggestions rather than
 
 * Change computer name in _Sharing_ in System Preferences. I call it macrafa.
 
+* Stop .DS_store files from getting written on mounted devices
+```
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool TRUE
+```
+
 * Change system preferences to automatically hide dock in _Dock_.
 
 * Go to mission control (F3) and add spaces (look up at the corner for + sign). I add three.

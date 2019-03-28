@@ -43,6 +43,9 @@ files from old computer.
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
+* Make $USER owner of /usr/local for easy installation using brew 
+
+
 * Add git-lfs with:
 ```
 brew install git-lfs
@@ -68,7 +71,17 @@ brew install wget
 
 * Install R studio
 
-* install https://tug.org/mactex/mactex-download.html download using safari
+
+
+* Install MacTex. Download using safari from https://tug.org/mactex/mactex-download.html 
+download using safari 
+
+* Alternatively, install tinytex. 
+
+```
+install.packages('tinytex')
+tinytex::install_tinytex()
+```
 
 * Try to knit with RStudio (PDF) so it installs packages (e.g. knitr)
 
@@ -132,7 +145,6 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 
 * Install printer with IP: 155.52.45.122
 
-* Make ririzarr owner of /usr/local for easy installation using brew 
 
 ```
 sudo chown -R $USER /usr/local

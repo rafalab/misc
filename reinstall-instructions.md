@@ -39,6 +39,8 @@ files from old computer.
 
 * Install DropBox
 
+* Intall AnyConnect for VPN: [https://dfcionline.org/departments/informationservices/remote/](https://dfcionline.org/departments/informationservices/remote/)
+
 * Type `git` in terminal so mac installs Xtools and other tools. 
 
 * Install R binaries. Or if you prefer from source, skip and see next item.

@@ -113,8 +113,7 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 
 * ~~Change .emacs to load ess from the dir~~
 
-* ~~Download markdown-mode.el and put he  ~/myDocuments/misc ess dir
-	git clone https://github.com/vspinu/polymode.git in the ess dir~~
+* ~~Download markdown-mode.el and put he  `~/myDocuments/misc` ess dir git clone https://github.com/vspinu/polymode.git in the ess dir~~
 
 * ~~The latest version of GNU Aspell is 0.60.6.1. Find it at ftp.gnu.org:/gnu/aspell~~
 

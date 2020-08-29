@@ -109,7 +109,7 @@ install_github(c("ririzarr/rafalib","genomicsclass/tissuesGeneExpression","genom
 
 * ~~Install emacs from http://emacsformacosx.com/~~ :(
 
-* ~~Install latest ess and put in ~/myDocuments/misc~~
+* ~~Install latest ess and put in `~/myDocuments/misc`~~
 
 * ~~Change .emacs to load ess from the dir~~
 

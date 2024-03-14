@@ -1,13 +1,13 @@
-# Using the excessmort package to generate an excess mortality plot for
-USA 2017-2023
+# Using the excessmort package to generate expeected versus observed
+mortality plots
 Rafael A. Irizarry
 
 ## Introduction
 
 This file contains two parts. First the data wrangling part, which is
-somewhat complex. Then we use compute expected death counts and plot
-along with observed counts. This is relatively simple with the
-`excessmort` package.
+somewhat complex. Then we compute expected death counts and plot along
+with observed counts. This is relatively simple with the `excessmort`
+package. We add examples of how to estimate excess mortality.
 
 <div>
 
@@ -71,8 +71,8 @@ dat <- dat[date <= as_date("2023-12-31")]
 dat <- dat[order(date),]
 ```
 
-Next we get population estimates from the Census. You will need a census
-API key which you can get from
+Next we get population estimates from the US Census. You will need a
+census API key which you can get from
 <https://api.census.gov/data/key_signup.html>. Create a file called
 `census-key.R` in your working directory with the following line in it:
 

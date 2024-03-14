@@ -199,7 +199,7 @@ and a plot:
 tibble(date = em$date, obs = em$observed, excess = em$expected*(exp(em$fitted) - 1), 
        upper = em$expected*(exp(em$fitted + 1.96*em$log_expected_se) - 1),
        lower = em$expected*(exp(em$fitted - 1.96*em$log_expected_se) - 1)) |>
-  filter(date >= make_date(2022,1,1)) |>
+  filter(date >= make_date(2020,1,1)) |>
   ggplot(aes(date, excess)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.5, fill = "purple") +
   geom_line(color = "purple") +

@@ -1,5 +1,5 @@
 ---
-title: "Using the excessmort package to generate expeected versus observed mortality plots"
+title: "Plotting expeected versus observed mortality with the excessmort prackage"
 author: "Rafael A. Irizarry"
 format: gfm
 ---

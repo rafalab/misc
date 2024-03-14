@@ -1,5 +1,5 @@
-# Using the excessmort package to generate expeected versus observed
-mortality plots
+# Plotting expeected versus observed mortality with the excessmort
+prackage
 Rafael A. Irizarry
 
 ## Introduction

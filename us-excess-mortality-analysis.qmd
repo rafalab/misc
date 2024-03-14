@@ -1,11 +1,17 @@
 ---
-title: "Using the excessmort package to generate excess mortality plot for USA 2017-2023"
+title: "Using the excessmort package to generate an excess mortality plot for USA 2017-2023"
 author: "Rafael A. Irizarry"
 format: gfm
 ---
 
+## Introduction
 
 This file contains two parts. First the data wrangling part, which is somewhat complex. Then we use compute expected death counts and plot along with observed counts. This is relatively simple with the `excessmort` package.
+
+:::{.callout-important}
+This document is meant as an example of how to use the `excessmort` package, not as a final analysis of excess mortality in the US.
+The excess mortality calculation presented here assumes the trend observed from 2017-2020 would have continued past 2020 until the end of 2023 had the pandemic not occurred. Different assumptions for the extrapoloation can lead to substantially different conclusions. The `excessmort` package can be used for this type of sensitivty analysis as well. Finally, note that for a final analysis I recommend performing a per-state and per age-strata analysis.
+::::
 
 ## Data wrangling
 

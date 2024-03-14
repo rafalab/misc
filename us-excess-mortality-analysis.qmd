@@ -1,5 +1,5 @@
 ---
-title: "Plotting expeected versus observed mortality with the excessmort prackage"
+title: "Plotting expeected versus observed mortality with excessmort prackage"
 author: "Rafael A. Irizarry"
 format: gfm
 ---

@@ -1,5 +1,4 @@
-# Plotting expeected versus observed mortality with the excessmort
-prackage
+# Plotting expeected versus observed mortality with excessmort prackage
 Rafael A. Irizarry
 
 ## Introduction

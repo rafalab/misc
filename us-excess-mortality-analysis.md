@@ -17,8 +17,8 @@ package. We add examples of how to estimate excess mortality.
 > excess mortality calculation presented here assumes the trend observed
 > from 2017-2020 would have continued past 2020 until the end of 2023
 > had the pandemic not occurred. Different assumptions for the
-> extrapoloation can lead to substantially different conclusions. The
-> `excessmort` package can be used for this type of sensitivty analysis
+> extrapolation can lead to substantially different conclusions. The
+> `excessmort` package can be used for this type of sensitivity analysis
 > as well. Finally, note that for a final analysis I recommend
 > performing a per-state and per age-strata analysis.
 
@@ -98,9 +98,9 @@ pop1 <- pop1 |> janitor::row_to_names(1)
 pop1 <- pop1[!grepl("4/1", DATE_DESC)]
 pop1 <- data.table(year = 2010 + as.numeric(pop1$DATE_CODE) - 3, population = as.numeric(pop1$POP))
 
-pop2 <- fread("https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/state/totals/NST-EST2023-ALLDATA.csv") 
+pop2_all <- fread("https://www2.census.gov/programs-surveys/popest/datasets/2020-2023/state/totals/NST-EST2023-ALLDATA.csv") 
 years <- 2020:2023
-pop2 <- pop2[NAME == "United States", ]
+pop2 <- pop2_all[NAME == "United States", ]
 cols <- paste0("POPESTIMATE", years)
 pop2 <- data.table(year = years, population = unlist(pop2[,..cols]))
 
@@ -207,3 +207,76 @@ tibble(date = em$date, obs = em$observed, excess = em$expected*(exp(em$fitted) -
 ```
 
 ![](us-excess-mortality-analysis_files/figure-commonmark/unnamed-chunk-12-1.png)
+
+## State-by-state analysis
+
+We start by wrangling data again but keeping state level info.
+
+``` r
+dat3 <- dt2014_2019[jurisdiction_of_occurrence != "United States"]
+dat3[, date := as_date(weekendingdate)]
+dat3 <- dat3[, c("jurisdiction_of_occurrence", "date", "allcause")]
+setnames(dat3, c("jurisdiction_of_occurrence", "allcause"), c("state", "outcome"))
+
+dat4 <- dt2020_present[state != "United States" & group == "By Week"]
+dat4 <- dat4[, c("state", "end_date", "total_deaths")]
+setnames(dat4, c("end_date", "total_deaths"), c("date", "outcome"))
+dat4[, date := as_date(date)]
+
+dat_states <- rbindlist(list(dat3, dat4), use.names = TRUE)
+dat_states[, outcome := as.numeric(outcome)]
+## combine NY state and NY city
+dat_states[state == "New York City", state := "New York"]
+dat_states[, outcome := sum(outcome), by = c("state", "date")]
+dat_states <- dat_states[date <= as_date("2023-12-31") & state != "New York City"]
+dat_states <- dat_states[order(date),]
+
+
+pop1_all <- request(api) |>  
+  req_url_query(get = I("POP,DATE_CODE,DATE_DESC,NAME"), 
+                `for` = I("state:*"),
+                key = census_key) |>
+  req_perform() |>
+  resp_body_string() |> 
+  fromJSON(flatten = TRUE) |>
+  as.data.table()
+pop3 <- pop1_all |> janitor::row_to_names(1) 
+pop3 <- pop3[!grepl("4/1", DATE_DESC)]
+pop3 <- with(pop3, data.table(year = 2010 + as.numeric(DATE_CODE) - 3, 
+                       state = NAME,
+                       population = as.numeric(POP)))
+
+pop4 <- pop2_all[NAME %in% pop3$state, ]
+cols <- c("NAME", paste0("POPESTIMATE", years))
+pop4 <- pop4[,..cols] |>
+   melt(id.vars = "NAME", 
+        variable.name = "year", 
+        value.name = "population")
+pop4[, year := as.numeric(gsub("POPESTIMATE", "", year))]
+setnames(pop4, "NAME", "state")
+
+pop_states <- rbindlist(list(pop3, pop4), use.names = TRUE)[order(state, year)]
+pop_states <- approx_demographics(pop_states)
+
+
+dat_states <- merge(dat_states, pop_states, by = c("state", "date"), all.x = TRUE)
+```
+
+Now we compute expected for each state:
+
+Now we make the plot (we order states by excess deaths per capita)
+
+``` r
+state_order <- expected[date >= make_date(2020,1,1), .(excess = sum((outcome - expected)/population)), by = state][order(-excess)]$state
+
+expected |> mutate(state = factor(state, levels = state_order)) |> 
+  ggplot(aes(x = date)) + 
+  geom_point(aes(y = outcome/population * 1000 * 52), size = 0.5) + 
+  geom_line(aes(y = expected/population * 1000 * 52), color = "red") + 
+  xlab("Date") +
+  ylab("Deaths per 1,000 per 365 days") + 
+  ggtitle("Death rates in the USA states from 2017 to 2023") +
+  facet_wrap(~state)
+```
+
+![](us-excess-mortality-analysis_files/figure-commonmark/unnamed-chunk-15-1.png)

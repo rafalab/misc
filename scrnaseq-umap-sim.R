@@ -1,5 +1,6 @@
 library(MASS)
 library(Matrix)
+library(ggplot2)
 plots <- FALSE
 
 set.seed(2024-1-12)  # For reproducibility
@@ -75,19 +76,21 @@ K <- 6
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:K)
 seurat_obj <- FindClusters(seurat_obj)  
 
+## change UMAP parameters so local structure is prioritized
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:K, n.neighbors = 15, min.dist = 0.1)
+p1 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
+  ggtitle("n.neighbors = 15, min.dist = 0.1")
+print(p1)
+
+ggsave(p1, filename = "~/Desktop/umap.png", width  = 6, height = 4)
+
+## run with defaults
 seurat_obj <- RunUMAP(seurat_obj, dims = 1:K)
 p0 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") 
 print(p0) + ggtitle("n.neighbors = 30, min.dist = 0.3")
 
 ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 6, height = 4)
 
-## change UMAP parameters so local structure is prioritized
-seurat_obj <- RunUMAP(seurat_obj, dims = 1:K, n.neighbors = 15, min.dist = 0.05)
-p1 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
-  ggtitle("n.neighbors = 15, min.dist = 0.05")
-print(p1)
-
-ggsave(p1, filename = "~/Desktop/umap.png", width  = 6, height = 4)
 
 
 

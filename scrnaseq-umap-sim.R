@@ -72,7 +72,7 @@ seurat_obj <- CreateSeuratObject(counts = counts)
 seurat_obj <- SCTransform(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj, features = VariableFeatures(object = seurat_obj))
 if(plots) ElbowPlot(seurat_obj)
-K <- 6
+K <- 30
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:K)
 seurat_obj <- FindClusters(seurat_obj)  
 
@@ -82,14 +82,15 @@ p1 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
   ggtitle("n.neighbors = 15, min.dist = 0.1")
 print(p1)
 
-ggsave(p1, filename = "~/Desktop/umap.png", width  = 6, height = 4)
+ggsave(p1, filename = "~/Desktop/umap.png", width  = 12, height = 8)
 
 ## run with defaults
 seurat_obj <- RunUMAP(seurat_obj, dims = 1:K)
-p0 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") 
-print(p0) + ggtitle("n.neighbors = 30, min.dist = 0.3")
+p0 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") + 
+  ggtitle("n.neighbors = 30, min.dist = 0.3")
+print(p0) 
 
-ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 6, height = 4)
+ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 12, height = 8)
 
 
 

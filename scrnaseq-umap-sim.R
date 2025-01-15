@@ -1,7 +1,7 @@
 library(MASS)
 library(Matrix)
 library(ggplot2)
-plots <- FALSE
+plots <- TRUE
 
 set.seed(2024-1-12)  # For reproducibility
 p <- 5000 ## number of genes
@@ -12,7 +12,7 @@ ps <- round(p*c(0.05, 0.04, 0.03, 0.02, 0.01, rep(0.005, 25)))
 mats <- lapply(ps, function(pp){
   P <- matrix(runif(1, 0.25, .66), pp, pp)
   diag(P) <- 1
-  s <- pmin(2, sqrt(1/rgamma(pp, 2, 1))) # some genes vary more than others
+  s <- pmin(1.5, sqrt(1/rgamma(pp, 2, 1))) # some genes vary more than others
   m <- P*outer(s,s)
   return(m)
 })
@@ -30,7 +30,7 @@ n_samples <- 10000  # Number of samples
 ## each gene has same expected value across all cells:
 ##this implies there are NO CLUSTERS
 ##note: we have n1 on genes and n0 off genes, that are independent
-odata <- cbind(mvrnorm(n_samples, mu = rnorm(n1, -1, 1.5), Sigma = cov_matrix),
+odata <- cbind(mvrnorm(n_samples, mu = pmin(1,rnorm(n1, -2, 1)), Sigma = cov_matrix),
                sweep(
                  sweep(
                    matrix(rnorm(n_samples*n0), n_samples, n0), 2, 
@@ -41,8 +41,8 @@ odata <- cbind(mvrnorm(n_samples, mu = rnorm(n1, -1, 1.5), Sigma = cov_matrix),
 ## Generate data from mixture model to mimic experimtail data
 K <- 10
 weights <- runif(K, 0.25, 0.75); weight <- weights/sum(weights)
-means <- rnorm(K, 1.75, 0.75)
-sds <- rep(0.075, K)
+means <- rnorm(K, 2.75, 0.75)
+sds <- rep(0.1, K)
 z <- sample(1:K, size = n_samples/K, replace = TRUE, prob = weights)
 coverage <-  rnorm(n_samples, mean = means[z], sd = sds[z])
 ## add log offset to mimic different coverate
@@ -82,7 +82,7 @@ p1 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
   ggtitle("n.neighbors = 15, min.dist = 0.1")
 print(p1)
 
-ggsave(p1, filename = "~/Desktop/umap.png", width  = 12, height = 8)
+ggsave(p1, filename = "~/Desktop/umap.png", width  = 10, height = 7.5)
 
 ## run with defaults
 seurat_obj <- RunUMAP(seurat_obj, dims = 1:K)
@@ -90,7 +90,7 @@ p0 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
   ggtitle("n.neighbors = 30, min.dist = 0.3")
 print(p0) 
 
-ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 12, height = 8)
+ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 10, height = 7.5)
 
 
 

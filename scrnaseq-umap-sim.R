@@ -4,7 +4,7 @@ library(matrixStats)
 library(ggplot2)
 
 ## Get a sense of data to creata realisti simulation
-plots <- TRUE
+plots <- FALSE
   
 set.seed(2024 - 1 - 12)  # For reproducibility
 p <- 15000 ## number of genes
@@ -23,7 +23,6 @@ mats <- lapply(ps, function(pp){
 # Combine blocks into a block diagonal covariance matrix
 cov_matrix <- bdiag(mats)
 
-options(future.globals.maxSize = 2 * 1024^3)
 n_samples <- 10000  # Number of samples
 ## generate correlated data
 ## each gene has same expected value across all cells:
@@ -38,21 +37,23 @@ odata <- rbind(
              
 ## Total coverage is different from cell to cell
 ## Generate data from mixture model to mimic experimental data
-K <- 5
+K <- 3
 weights <- runif(K, 0.25, 0.75); weights <- weights/sum(weights)
-means <- log(10^seq(3,5, len = K))
-s <- rep(0.3, K)
+means <- log(10^seq(3.5, 4.5, len = K))
+s <- rep(0.375, K)
 z <- sample(1:K, size = n_samples, replace = TRUE, prob = weights)
 coverage <-  rnorm(n_samples, mean = means[z], sd = s[z])
 ## add log offset to mimic different coverate
 data <- sweep(odata, 2, coverage, FUN = "+")
-data[data>log(200)] <- log(200) ##remove outliers
+data[data > log(200)] <- log(200) ##don't let count get too big
 ## Generate counts using Poisson variation
 counts <- matrix(rpois(length(unlist(data)), exp(unlist(data))), 
                  nrow(data), ncol(data))
 ## Leverage sparsity and add rownames and colnames
 counts <- as(counts, "dgCMatrix")
 gc();gc() ## Garbage collection after making smaller object
+
+
 rownames(counts) <- paste0("Gene", 1:nrow(counts))
 colnames(counts) <- paste0("Cell", 1:ncol(counts))
 
@@ -60,11 +61,13 @@ colnames(counts) <- paste0("Cell", 1:ncol(counts))
 
 ## Follow standard Suerat pipeline 
 library(Seurat)
+options(future.globals.maxSize = 2 * 1024^3)
 seurat_obj <- CreateSeuratObject(counts = counts)
 seurat_obj <- SCTransform(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj, features = VariableFeatures(object = seurat_obj))
-if(plots) ElbowPlot(seurat_obj)
-D <- 30
+#if(plots) 
+ElbowPlot(seurat_obj, ndims = 50)
+D <- 10 ## "elbows are seen at around 10 and at around 30
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)
 seurat_obj <- FindClusters(seurat_obj)  
 
@@ -85,7 +88,6 @@ print(p0)
 ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 10, height = 7.5)
 
 
-
 ## CHECKS
 if(plots){
   ### check that simnulations mimics a real dataset
@@ -104,11 +106,6 @@ if(plots){
   rafalib::mypar(2,1)
   hist(log(mu),nc = 100,xlim = c(-18,-3))
   hist(rowMeans(odata),nc = 100,xlim = c(-18,-3))
-  
-  ## is coverage in the same range. We want it a bit higher
-  rafalib::mypar(2,1); 
-  hist(log(cov),xlim=range(log(cov)),nc=100)
-  hist(coverage,nc=100)
   
   ## miniumu coverage not too small
   print(min(colSums(counts)))
@@ -132,6 +129,18 @@ if(plots){
   ## should be between 1.000 and 100,000
   hist(log10(colSums(counts)),nc=100)
 }
-  
+
+## If you want to try another dataset
+#data("pbmc_facs", package = "fastTopics")
+#ind <- which(stringr::str_extract(rownames(pbmc_facs$counts), "(?<=-)[^-]+$") == "b_cells")
+#x <- t(pbmc_facs$counts[ind,])
+
+## GLM PCA removes coverage effect
+# library(fastglmpca)
+# fastglmpca::set_fastglmpca_threads(11)
+# o <- sample(nrow(counts), 2000)
+# gpca <- fastglmpca::fit_glmpca_pois(counts[o,], 50, control = list(maxiter = 1000))
+# plot(log10(colSums(counts[o,])), gpca$V[,1])
+
 
 

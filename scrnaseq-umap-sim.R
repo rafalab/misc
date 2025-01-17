@@ -2,23 +2,42 @@ library(MASS)
 library(Matrix)
 library(matrixStats)
 library(ggplot2)
-
+library(lme4)
 ## Get a sense of data to creata realisti simulation
 plots <- FALSE
   
+## Get means and SDs from real data:
+
+data("pbmc_facs", package = "fastTopics")
+ind <- which(stringr::str_extract(rownames(pbmc_facs$counts), "(?<=-)[^-]+$") == "cd34_filtered")
+x <- as.matrix(pbmc_facs$counts[ind,])
+x <- x[,colSums(x)>0]
+N <- rowSums(x)
+obs <- 1:nrow(x)
+## stats has the mean and the standard deviation of the log normal
+stats <- rbind(log(colSums(x)/sum(N)), 0)
+high_ind <- which(exp(stats[1,])*median(N) >= 1) ## if average of 1 count per sample we fit glmm
+res <- apply(x[,high_ind], 2, function(y){
+  fit <- suppressMessages(glmer(y ~ 1 + (1|obs), family = poisson(link = "log"), offset = log(N)))
+  if(is.null(fit@optinfo$conv$lme4$messages)) return(c(fixef(fit), attr(VarCorr(fit)$obs, "stddev"))) else return(c(log(sum(y)/sum(N)), 0))
+})
+stats[,high_ind] <- res
+stats[2, stats[2,]>2] <- 2 ## cap the SD
+
+stats <- stats[,order(stats[1,], decreasing = TRUE)]
 set.seed(2024 - 1 - 12)  # For reproducibility
-p <- 15000 ## number of genes
+p <- ncol(stats)
 
 ## To mimic gene networks we will create a block diagonal covariance matrix
-ps <- round(p*c(0.005, 0.004, 0.003, 0.002, 0.001, rep(0.0005, 25)))
+ps <- round(p*c(0.01, 0.008, 0.006, 0.004, 0.002, rep(0.001, 25)))
+starts <- head(c(1,cumsum(ps)),-1) - 1
 p1 <- sum(ps)
-p0 <- round((p - p1)*.75)
-p00 <- p - p0 - p1
-mats <- lapply(ps, function(pp){
-  corr <- matrix(runif(1, 0.25, .66), pp, pp) ## correlation
+p0 <- p - p1
+mats <- lapply(seq_along(ps), function(i){
+  corr <- matrix(runif(1, 0.25, .66), ps[i], ps[i]) ## correlation
   diag(corr) <- 1
-  s <- sqrt(1/rgamma(pp, 4, 4)) # some genes vary more than others
-  return(corr*outer(s,s))
+  ind <- starts[i] + seq(1, ps[i])
+  return(corr*outer(stats[2,ind],stats[2,ind]))
 })
 # Combine blocks into a block diagonal covariance matrix
 cov_matrix <- bdiag(mats)
@@ -28,24 +47,23 @@ n_samples <- 10000  # Number of samples
 ## each gene has same expected value across all cells:
 ##this implies there are NO CLUSTERS
 ##note: we have p1 "on" genes that are correlated with other genes
-## and p0 off genes, and p00 completely off genes that are independent and have no variance. Sampling variation added later.
-## the genes on the rows for Seurat
+## and p0 off genes, with no covariance.
 odata <- rbind(
-  t(mvrnorm(n_samples, mu = runif(p1, -8, -4), Sigma = cov_matrix)),
-    matrix(rnorm(n_samples*p0), p0, n_samples)*sqrt(1/rgamma(p0, 3, .7)) + rnorm(p0, -12, 1.5),
-    matrix(0, p00, n_samples) + rnorm(p00, -15, 1))
-             
+  t(mvrnorm(n_samples, mu = stats[1, 1:p1], Sigma = cov_matrix)),
+    matrix(rnorm(n_samples*p0), p0, n_samples)*stats[2,(p1+1):p] + stats[1,(p1+1):p])
 ## Total coverage is different from cell to cell
 ## Generate data from mixture model to mimic experimental data
+## coverage we shoot for:
 K <- 3
 weights <- runif(K, 0.25, 0.75); weights <- weights/sum(weights)
-means <- log(10^seq(3.5, 4.5, len = K))
-s <- rep(0.375, K)
+means <- seq(3.5, 4.5, len = K)
+s <- rep(0.15, K)
 z <- sample(1:K, size = n_samples, replace = TRUE, prob = weights)
-coverage <-  rnorm(n_samples, mean = means[z], sd = s[z])
+lN <-  log(10^rnorm(n_samples, mean = means[z], sd = s[z]))
 ## add log offset to mimic different coverate
-data <- sweep(odata, 2, coverage, FUN = "+")
-data[data > log(200)] <- log(200) ##don't let count get too big
+data <- sweep(odata, 2, lN, FUN = "+")
+
+#data[data > log(200)] <- log(200) ##don't let count get too big
 ## Generate counts using Poisson variation
 counts <- matrix(rpois(length(unlist(data)), exp(unlist(data))), 
                  nrow(data), ncol(data))
@@ -67,7 +85,7 @@ seurat_obj <- SCTransform(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj, features = VariableFeatures(object = seurat_obj))
 #if(plots) 
 ElbowPlot(seurat_obj, ndims = 50)
-D <- 10 ## "elbows are seen at around 10 and at around 30
+D <- 15 ## "elbows are seen at around 10 and at around 30
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)
 seurat_obj <- FindClusters(seurat_obj)  
 
@@ -90,21 +108,15 @@ ggsave(p0, filename = "~/Desktop/umap-0.png", width  = 10, height = 7.5)
 
 ## CHECKS
 if(plots){
-  ### check that simnulations mimics a real dataset
-  data("pbmc_facs", package = "fastTopics")
-  cov <- rowSums(pbmc_facs$counts)
-  x <- pbmc_facs$counts/cov
-  mu <- colMeans(x)
-  sds <- colSds(as.matrix(log(x+min(x[x>0])/2)))
   
   ## Is SD for expressed genes similar to simulation
   rafalib::mypar(1,2)
-  hist(sds[mu > -8], nc = 25, xlim = c(0,3))
-  hist(sqrt(diag(cov_matrix)), nc = 25, xlim = c(0,3)) 
+  hist(stats[2, stats[1,] > -8], nc = 25, xlim = c(0,2))
+  hist(sqrt(diag(cov_matrix)), nc = 25, xlim = c(0,2)) 
   
   ## Is distribution of mean expression for genes similar 
   rafalib::mypar(2,1)
-  hist(log(mu),nc = 100,xlim = c(-18,-3))
+  hist(stats[1,],nc = 100,xlim = c(-18,-3))
   hist(rowMeans(odata),nc = 100,xlim = c(-18,-3))
   
   ## miniumu coverage not too small
@@ -115,16 +127,24 @@ if(plots){
   hist(colMeans(counts==0), nc =100)
   ## log mean counts match real dataset
   rafalib::mypar(2,1)
-  hist(log(rowMeans(counts)), nc = 100)
-  hist(log(mu), nc = 100)
+  hist(log(rowMeans(sweep(counts, 2, colSums(counts), FUN = "/"))), nc = 100)
+  hist(stats[1,], nc = 100)
   rafalib::mypar(1,1)
-  qqplot(log(mu), log(rowMeans(sweep(counts, 2, colSums(counts), FUN = "/"))));abline(0,1)
+  qqplot(stats[1,], log(rowMeans(sweep(counts, 2, colSums(counts), FUN = "/"))));abline(0,1)
   ## sd of log counts match real dataset
   rafalib::mypar(2,1)
-  hist(apply(log(counts+1), 1, sd), nc = 100, xlim = c(0,4))
-  hist(sds, nc = 100, xlim = c(0,4))
+  N1 <- colSums(counts)
+  ss1 <- apply(log(sweep(counts, 2, N1, FUN = "/") * median(N1) + 0.5), 1, sd)
+  N2 <- rowSums(x)
+  ss2 <- apply(log(sweep(x, 1, N2, FUN = "/") * median(N2) + 0.5), 2, sd)
+  
+  
+  rafalib::mypar(2,1)
+  hist(ss1, nc=100, xlim = c(0,1))
+  hist(ss2, nc=100, xlim = c(0,1))
+  
   rafalib::mypar(1,1)
-  qqplot(sds, apply(log(counts+1), 1, sd));abline(0,1)
+  qqplot(ss1, ss2);abline(0,1)
   ## observed coverage seem realistic?
   ## should be between 1.000 and 100,000
   hist(log10(colSums(counts)),nc=100)
@@ -136,11 +156,15 @@ if(plots){
 #x <- t(pbmc_facs$counts[ind,])
 
 ## GLM PCA removes coverage effect
-# library(fastglmpca)
-# fastglmpca::set_fastglmpca_threads(11)
-# o <- sample(nrow(counts), 2000)
-# gpca <- fastglmpca::fit_glmpca_pois(counts[o,], 50, control = list(maxiter = 1000))
-# plot(log10(colSums(counts[o,])), gpca$V[,1])
+library(fastglmpca)
+fastglmpca::set_fastglmpca_threads(11)
+o <- sample(nrow(counts), 1000)
+fgpca <- fastglmpca::fit_glmpca_pois(counts[o,], 10, control = list(maxiter = 100))
+plot(log10(colSums(counts[o,])), fgpca$V[,1])
 
+library(glmpca)
+gpca <- glmpca(counts[o,], 10, fam = "nb2")
+plot(log10(colSums(counts[o,])), gpca$factors[,1])
 
-
+sct <- Embeddings(seurat_obj, reduction = "pca")
+plot(colSums(counts), sct[,2])

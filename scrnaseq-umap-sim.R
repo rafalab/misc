@@ -3,24 +3,28 @@ library(Matrix)
 library(matrixStats)
 library(ggplot2)
 library(lme4)
-## Get a sense of data to creata realisti simulation
+
+## If TRUE diagnostic plots are made
 plots <- FALSE
   
 ## Get means and SDs from real data.
-## We don't compute SD for genes with no evidence sample sd = sample mean
 data("pbmc_facs", package = "fastTopics")
 ind <- which(stringr::str_extract(rownames(pbmc_facs$counts), "(?<=-)[^-]+$") == "cd34_filtered")
 x <- as.matrix(pbmc_facs$counts[ind,])
-x <- x[,colSums(x)>0]
+x <- x[,colSums(x) > 0]
 n <- rowSums(x)
 N <- sum(n)
 l <- colSums(x)/N
 phi <- colSums((x - outer(n, l))^2/outer(n, l))/(nrow(x) - 1)
-## only overdispersed genes that have at least one 5 count
-ind <- phi  > qchisq(0.95, nrow(x) - 1)/(nrow(x) - 1) & colSums(x >= 5) > 0
-obs <- as.factor(1:nrow(x))
-glmm_res <- matrix(NA, 3, ncol(x))
-glmm_res[,ind] <- sapply(which(ind), function(i){
+
+## Fit Poisson-log-normal model save 
+### We don't compute SD for genes with no evidence that sample var > sample mean
+### To avoid computational instability we require at least one count >= 5
+ind <- which(phi  > qchisq(0.95, nrow(x) - 1)/(nrow(x) - 1) & colSums(x >= 5) > 0)
+### To avoid bursty genes cap SD at 2.5
+sd_max <- 2.5
+obs <- as.factor(1:nrow(x)) ## random effect
+glmm_res <- sapply(ind, function(i){
   y <- x[,i]
   sigma0 <- sqrt(log(phi[i]))
   mu0 <- log(l[i]) - sigma0^2/2
@@ -30,24 +34,29 @@ glmm_res[,ind] <- sapply(which(ind), function(i){
           control = glmerControl(optimizer = "bobyqa"))
   )
   msg <- fit@optinfo$conv$lme4$messages
-  if(!is.null(msg)){ 
+  if(!is.null(msg)){  ## if no convergence use sigma=0
     if(any(grepl("failed to converge", msg))){
-      return(c(fixef(fit), sqrt(VarCorr(fit)$obs[1,1]), 0))
+      return(c(log(l[i]), 0))
     }
   }
-  return(c(fixef(fit), sqrt(VarCorr(fit)$obs[1,1]),1))
+  s <- sqrt(VarCorr(fit)$obs[1,1]) 
+  if(s > sd_max) return(c(log(l[i]), 0))
+                        
+  return(c(fixef(fit), s))
 })
-## we will remove the few that don't converge
-## and high variance genes that appear to be bursts or markers for wrong celltype
+## To help decide on sd_max value look at this plot
 if(plots) hist(log2(glmm_res[2,]),nc=100) 
-ind <- ind & glmm_res[3,]==1 & glmm_res[2,] < 2.5
+
 ## for the rest of genes we assume Poisson, or sigma = 0
 stats <- rbind(log(l), 0)
-stats[,ind] <- glmm_res[1:2,ind]
+stats[,ind] <- glmm_res
+
+## index for Poisson-log-normal genes
+ind1 <- which(stats[2,] > 0)
 
 ## get an idea of gene-gene correlations
 if(plots){
-  cc <- cor(log(x[,ind]/N*median(N) + 0.5))
+  cc <- cor(log(x[,ind1]/N*median(N) + 0.5))
   hist(cc[upper.tri(cc)],nc=100)
   boxplot(cc[upper.tri(cc)])
   heatmap(cc)
@@ -56,53 +65,51 @@ if(plots){
 ### START SIMULATION
 set.seed(2024 - 1 - 12)  # For reproducibility
 
-p <- sum(ind)
-### Three kinds of genes
-## 1- in networks (have bio variability). We remove bursty genes
+### We simulate three kinds of genes
+## 1- in networks, with biological variability.
 ## 2- not in networks but with biological variability and
-## 3- just Poisson
+## 3- genes showing just Poisson sampling variability
 
+## generate cov-matrix for group 1
 ## randomly put genes into networks
 groups <- c(rep(1,25), rep(2:6, each = 10), rep(7:15, each = 5))
 p1 <- length(groups)
-inds <- split(sample(which(ind), p1), groups)
-ind0 <- setdiff(1:ncol(x), unlist(inds))
-p0 <- length(ind0)
 ## To mimic gene networks we will create a block diagonal covariance matrix
+inds <- split(sample(ind1, p1), groups)
 mats <- lapply(inds, function(i){
-  pp <- length(i)
-  corr <- matrix(runif(1, 0.25, .66), pp, pp) ## correlation
+  corr <- matrix(runif(1, 0.25, .66), length(i), length(i)) ## correlation
   diag(corr) <- 1
   return(corr*outer(stats[2,i],stats[2,i]))
 })
 # Combine blocks into a block diagonal covariance matrix
 cov_matrix <- bdiag(mats)
 
+## create an index for the rest
+ind0 <- setdiff(1:ncol(x), unlist(inds))
+p0 <- length(ind0)
+
 n_samples <- 10000  # Number of samples
 ## generate correlated data
 ## each gene has same expected value across all cells:
 ##this implies there are NO CLUSTERS
 ##note: we have p1 "on" genes that are correlated with other genes
-## and p0 off genes, with no covariance.
+## and p0 genes, with no covariance.
 odata <- rbind(
   t(mvrnorm(n_samples, mu = stats[1, unlist(inds)], Sigma = cov_matrix)),
     matrix(rnorm(n_samples*p0), p0, n_samples)*stats[2,ind0] + stats[1,ind0])
 ## Total coverage is different from cell to cell
 ## Generate data from mixture model to mimic experimental data
-## coverage we shoot for:
 K <- 3
 weights <- runif(K, 0.25, 0.75); weights <- weights/sum(weights)
 means <- seq(3.75, 4.25, len = K)
 s <- rep(0.1, K)
 z <- sample(1:K, size = n_samples, replace = TRUE, prob = weights)
 lN <-  log(10^rnorm(n_samples, mean = means[z], sd = s[z]))
-## add log offset to mimic different coverate
+## add log offset to mimic different coverage
 data <- sweep(odata, 2, lN, FUN = "+")
 
-#data[data > log(200)] <- log(200) ##don't let count get too big
 ## Generate counts using Poisson variation
-counts <- matrix(rpois(length(unlist(data)), exp(unlist(data))), 
-                 nrow(data), ncol(data))
+counts <- matrix(rpois(length(data), exp(unlist(data))), nrow(data), ncol(data))
 ## Leverage sparsity and add rownames and colnames
 counts <- as(counts, "dgCMatrix")
 gc();gc() ## Garbage collection after making smaller object
@@ -121,7 +128,7 @@ seurat_obj <- SCTransform(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj, features = VariableFeatures(object = seurat_obj))
 #if(plots) 
 ElbowPlot(seurat_obj, ndims = 50)
-D <- 15 ## "elbows are seen at around 10 and at around 30
+D <- 40 ## "elbows are seen at around 10 and at around 30
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)
 seurat_obj <- FindClusters(seurat_obj)  
 

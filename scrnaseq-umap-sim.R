@@ -1,3 +1,28 @@
+## To simulate scRNA-Seq data with no biological groups, 
+## we generate IID multinomial samples in the following way:
+
+## Step 1: Estimate gene-specific mean and standard deviation from real data
+##         - Use a real dataset to estimate the mean and standard deviation for each gene.
+##         - Fit a Poisson-log-normal distribution to genes exhibiting over-dispersion.
+
+## Step 2: Compute correlation structure
+##         - Obtain the sample correlation of log-transformed counts for over-dispersed genes.
+
+## Step 3: Generate synthetic data
+##         - Generate multivariate normal data for n_samples using the estimated means, standard deviations, and correlations.
+
+## Step 4: Handle non-over-dispersed genes
+##         - Assume a fixed mean across samples for genes that do not exhibit over-dispersion.
+
+## Step 5: Simulate sequencing coverage
+##         - Generate sequencing coverage that mimics real experimental conditions.
+
+## Step 6: Convert data to probabilities
+##         - Standardize the generated data to obtain probabilities for multinomial sampling.
+
+## Step 7: Generate final multinomial samples
+##         - Generate random multinomial count data for each sample using the computed probabilities.
+
 library(MASS)
 library(Matrix)
 library(matrixStats)
@@ -6,8 +31,8 @@ library(lme4)
 
 ## If TRUE diagnostic plots are made
 plots <- FALSE
-  
-## Get means and SDs from real data.
+
+## Load real experimental data    
 data("pbmc_facs", package = "fastTopics")
 ind <- which(stringr::str_extract(rownames(pbmc_facs$counts), "(?<=-)[^-]+$") == "cd34_filtered")
 x <- as.matrix(pbmc_facs$counts[ind,])
@@ -16,134 +41,107 @@ n <- rowSums(x)
 N <- sum(n)
 l <- colSums(x)/N
 phi <- colSums((x - outer(n, l))^2/outer(n, l))/(nrow(x) - 1)
-
-## Fit Poisson-log-normal model save 
+## Fit Poisson-log-normal model 
 ### We don't compute SD for genes with no evidence that sample var > sample mean
 ### To avoid computational instability we require at least one count >= 5
 ind <- which(phi  > qchisq(0.95, nrow(x) - 1)/(nrow(x) - 1) & colSums(x >= 5) > 0)
-### To avoid bursty genes cap SD at 2.5
-sd_max <- 2.5
+### To avoid super large values cap SD so that the chance of seeing values larger than max is very small
+max <- log(7500) - log(10^5) ## log of largest wanted value minus log coverage
 obs <- as.factor(1:nrow(x)) ## random effect
 glmm_res <- sapply(ind, function(i){
   y <- x[,i]
   sigma0 <- sqrt(log(phi[i]))
   mu0 <- log(l[i]) - sigma0^2/2
-  fit <- suppressMessages(
+  fit <- try(suppressMessages(
     glmer(y ~ 1 + (1|obs),  offset = log(n), family = poisson(link = "log"), 
           start = list(theta = sigma0, fixef = mu0),
           control = glmerControl(optimizer = "bobyqa"))
-  )
+  ))
+  if(class(fit) == "try-error") return(c(log(l[i]), 0))
   msg <- fit@optinfo$conv$lme4$messages
-  if(!is.null(msg)){  ## if no convergence use sigma=0
-    if(any(grepl("failed to converge", msg))){
+  if(!is.null(msg)){  if(any(grepl("failed to converge", msg))){
       return(c(log(l[i]), 0))
-    }
-  }
-  s <- sqrt(VarCorr(fit)$obs[1,1]) 
-  if(s > sd_max) return(c(log(l[i]), 0))
-                        
-  return(c(fixef(fit), s))
+  }}
+  m <- fixef(fit); s <- sqrt(VarCorr(fit)$obs[1,1])
+  return(c(m, pmin(s,(max - m)/qnorm(1-1/10^5)))) ##1/10^5 chance of reaching max
 })
 ## To help decide on sd_max value look at this plot
-if(plots) hist(log2(glmm_res[2,]),nc=100) 
+if (plots){
+  hist(log2(glmm_res[2,]), nc = 100) 
+  plot(t(glmm_res))
+}
 
 ## for the rest of genes we assume Poisson, or sigma = 0
 stats <- rbind(log(l), 0)
+## for overdispersed genes used fitted parameters
 stats[,ind] <- glmm_res
 
-## index for Poisson-log-normal genes
+## index and size for Poisson-log-normal genes
 ind1 <- which(stats[2,] > 0)
-
-## get an idea of gene-gene correlations
-if(plots){
-  cc <- cor(log(x[,ind1]/N*median(N) + 0.5))
-  hist(cc[upper.tri(cc)],nc=100)
-  boxplot(cc[upper.tri(cc)])
-  heatmap(cc)
-}
-
-### START SIMULATION
-set.seed(2024 - 1 - 12)  # For reproducibility
-
-### We simulate three kinds of genes
-## 1- in networks, with biological variability.
-## 2- not in networks but with biological variability and
-## 3- genes showing just Poisson sampling variability
-
-## generate cov-matrix for group 1
-## randomly put genes into networks
-groups <- c(rep(1,25), rep(2:6, each = 10), rep(7:15, each = 5))
-p1 <- length(groups)
-## To mimic gene networks we will create a block diagonal covariance matrix
-inds <- split(sample(ind1, p1), groups)
-mats <- lapply(inds, function(i){
-  corr <- matrix(runif(1, 0.25, .66), length(i), length(i)) ## correlation
-  diag(corr) <- 1
-  return(corr*outer(stats[2,i],stats[2,i]))
-})
-# Combine blocks into a block diagonal covariance matrix
-cov_matrix <- bdiag(mats)
-
-## create an index for the rest
-ind0 <- setdiff(1:ncol(x), unlist(inds))
+p1 <- length(ind1)
+## index and size for Poisson genes
+ind0 <- which(stats[2,] == 0)
 p0 <- length(ind0)
 
-n_samples <- 10000  # Number of samples
-## generate correlated data
-## each gene has same expected value across all cells:
-##this implies there are NO CLUSTERS
-##note: we have p1 "on" genes that are correlated with other genes
-## and p0 genes, with no covariance.
-odata <- rbind(
-  t(mvrnorm(n_samples, mu = stats[1, unlist(inds)], Sigma = cov_matrix)),
-    matrix(rnorm(n_samples*p0), p0, n_samples)*stats[2,ind0] + stats[1,ind0])
-## Total coverage is different from cell to cell
-## Generate data from mixture model to mimic experimental data
-K <- 3
-weights <- runif(K, 0.25, 0.75); weights <- weights/sum(weights)
-means <- seq(3.75, 4.25, len = K)
-s <- rep(0.1, K)
-z <- sample(1:K, size = n_samples, replace = TRUE, prob = weights)
-lN <-  log(10^rnorm(n_samples, mean = means[z], sd = s[z]))
-## add log offset to mimic different coverage
-data <- sweep(odata, 2, lN, FUN = "+")
+## get an estimate of gene-gene correlations
+cc <- cor(log(x[,ind1]/n*median(n) + 0.5))
+## use estimated correlatiosn and SDs to form covariance matrix
+cov_matrix <- cc*outer(stats[2,ind1], stats[2,ind1])
 
-## Generate counts using Poisson variation
-counts <- matrix(rpois(length(data), exp(unlist(data))), nrow(data), ncol(data))
-## Leverage sparsity and add rownames and colnames
+### START SIMULATION
+set.seed(2024 - 1 - 22)  # For reproducibility
+n_samples <- 25000  # Number of samples
+odata <- rbind(
+  t(mvrnorm(n_samples, mu = stats[1, ind1], Sigma = cov_matrix)),
+  matrix(0, p0, n_samples) + stats[1,ind0])
+
+## Generate coverage data mimicking real data
+K <- 5
+weights <- runif(K, 0.25, 0.75); weights <- weights/sum(weights)
+means <- seq(3, 4.5, len = K)
+s <- rep(0.15, K)
+z <- sample(1:K, size = n_samples, replace = TRUE, prob = weights)
+n <-  round(10^rnorm(n_samples, mean = means[z], sd = s[z]))
+if(plots) hist(log10(n),nc=100)
+ps <- sweep(exp(odata), 2, colSums(exp(odata)), FUN = "/")
+counts <- sapply(1:n_samples, function(i) rmultinom(1, n[i], ps[,i]))
 counts <- as(counts, "dgCMatrix")
 gc();gc() ## Garbage collection after making smaller object
-
+if(plots) print(max(counts))
 
 rownames(counts) <- paste0("Gene", 1:nrow(counts))
 colnames(counts) <- paste0("Cell", 1:ncol(counts))
 
 ## Simulation ends here
+#########################
 
-## Follow standard Suerat pipeline 
+## Follow standard Seurat pipeline 
 library(Seurat)
 options(future.globals.maxSize = 2 * 1024^3)
 seurat_obj <- CreateSeuratObject(counts = counts)
 seurat_obj <- SCTransform(seurat_obj)
 seurat_obj <- RunPCA(seurat_obj, features = VariableFeatures(object = seurat_obj))
-#if(plots) 
-ElbowPlot(seurat_obj, ndims = 50)
-D <- 40 ## "elbows are seen at around 10 and at around 30
+if (plots) ElbowPlot(seurat_obj, ndims = 50)
+D <- 25 
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)
 seurat_obj <- FindClusters(seurat_obj)  
 
-## change UMAP parameters so local structure is prioritized
-seurat_obj <- RunUMAP(seurat_obj, dims = 1:D, n.neighbors = 15, min.dist = 0.1)
+## change UMAP parameters so local structure is prioritized 
+## we use the limits of what the Seurat documentation says is reasonable
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:D, n.neighbors = 5, min.dist = 0.001)
 plot1 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") +
-  ggtitle("n.neighbors = 15, min.dist = 0.1")
+  ggtitle("25 PCs, n.neighbors = 5, min.dist = 0.001")
 print(plot1)
 
 ggsave(plot1, filename = "~/Desktop/umap.png", width  = 10, height = 7.5)
 
-## run with defaults
+## run UMAP with PC = 10 and defaults
+D <- 10
+seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)
+seurat_obj <- FindClusters(seurat_obj)  
 seurat_obj <- RunUMAP(seurat_obj, dims = 1:D)
 plot0 <- DimPlot(seurat_obj, reduction = "umap", group.by = "seurat_clusters") + 
-  ggtitle("n.neighbors = 30, min.dist = 0.3")
+  ggtitle("10 PCs, n.neighbors = 30, min.dist = 0.3")
 print(plot0) 
 
 ggsave(plot0, filename = "~/Desktop/umap-0.png", width  = 10, height = 7.5)
@@ -195,29 +193,12 @@ if(plots){
   
   ## do we see correlation in simulated data
   image(cor(t(odata[1:p1,])))
+  
+  ## overall distribution (take a long time)
+  rafalib::mypar(1,1)
+  qs <- c(0, 0.5, 0.75, 0.8, 0.9, seq(0.901, 1, 0.001))
+  plot(quantile(log2(x/rowSums(x)*median(rowSums(x))+0.5), qs), 
+       quantile(log2(sweep(counts, 2, colSums(counts), FUN="/")*median(colSums(counts)) + 0.5), qs))
+  plot(log2(0.5+quantile(x/rowSums(x), qs)), log2(0.5+quantile(sweep(counts,2,colSums(counts)), qs)))
+  
 }
-
-## If you want to try another dataset
-#data("pbmc_facs", package = "fastTopics")
-#ind <- which(stringr::str_extract(rownames(pbmc_facs$counts), "(?<=-)[^-]+$") == "b_cells")
-#x <- t(pbmc_facs$counts[ind,])
-if(FALSE){
-## GLM PCA removes coverage effect
-o <- sample(nrow(counts), 1000)
-
-library(fastglmpca)
-fastglmpca::set_fastglmpca_threads(11)
-fgpca <- fastglmpca::fit_glmpca_pois(counts[o,], 10, control = list(maxiter = 25))
-plot(log10(colSums(counts[o,])), fgpca$V[,1])
-
-library(glmpca)
-gpca <- glmpca(counts[o,], 10, fam = "nb2")
-plot(log10(colSums(counts[o,])), gpca$factors[,1])
-cor(log10(colSums(counts[o,])), gpca$factors[,1])
-
-sct <- Embeddings(seurat_obj, reduction = "pca")
-plot(log10(colSums(counts)), sct[,1])
-cor(log10(colSums(counts)), sct[,1:5])
-
-}
-

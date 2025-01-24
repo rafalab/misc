@@ -135,6 +135,23 @@ print(plot1)
 
 ggsave(plot1, filename = "~/Desktop/umap.png", width  = 10, height = 7.5)
 
+### Find marker genes and show them on the UMAP
+markers <- sapply(c(10,12,13,17), function(cl){
+  de_markers <- FindMarkers(object = seurat_obj,
+                            ident.1 = as.character(cl),  # Replace with the cluster number or name
+                            test.use = "wilcox",   # Default test (Wilcoxon Rank Sum Test)
+                            logfc.threshold = 0.25, # Log fold change threshold
+                            min.pct = 0.1 )          # Minimum fraction of cells expressing the gene
+  c(rownames(de_markers)[1], de_markers$p_val_adj[1])
+})
+
+plots <- lapply(markers[1,], function(gn){
+  pl <- FeaturePlot(seurat_obj, features = gn,  reduction = "umap", max.cutoff = "q95", min.cutoff = "q50")
+  return(pl)
+})
+plot2 <- gridExtra::grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], ncol=2)
+ggsave(plot2, filename = "~/Desktop/markers.png", width  = 10, height = 10)
+
 ## run UMAP with PC = 10 and defaults
 D <- 10
 seurat_obj <- FindNeighbors(seurat_obj, dims = 1:D)

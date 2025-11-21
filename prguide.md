@@ -12,10 +12,8 @@ This website lets you search for recommendations by topic:
 |---------------|---------------|---------------|---------------|---------------|
 | Old San Juan | Old San Juan | Easy |  | **Walking around** A compact, historic area that is great for exploring on foot. |
 | Deaverdura | Old San Juan | Easy |  | **Restaurant (Favorite)** Local authentic Puerto Rican food. Very popular. |
-| La Bombonera | Old San Juan | Easy | 259 Calle San Francisco | **Restaurant (Favorite)** Classic café; excellent coffee and toasted mallorcas. |
 | Aqui Se Puede | Old San Juan | Easy | 50 Calle San Justo | **Bar** Good music; located on lively Calle San Sebastián. |
 | Fonda del Jibarito | Old San Juan | Easy | 280 Calle Sol | **Restaurant** Best-value Puerto Rican food in OSJ. |
-| La Mallorca | Old San Juan | Easy | 300 Calle San Francisco | **Restaurant** Like La Bombonera but cheaper and shorter waits. |
 | South Fortaleza (SoFo) | Old San Juan | Easy | Calle Fortaleza | **Restaurants** Trendy dining district; Dragon Fly = Asian–Latin fusion. |
 | El Morro | Old San Juan | Easy | NW Corner | **Historic Site (Favorite) ** 16th-century Spanish fort; must-see. |
 | Paseo de la Princesa | Old San Juan | Easy | End of Recinto Sur | **Promenade** See La Fortaleza, Puerta de San Juan, and street cats. |

@@ -81,12 +81,16 @@ This website lets you search for recommendations by topic:
 
 ## SOUTH (PONCE, YAÚCO, SANTA ISABEL)
 
+| Place | Area | Difficulty | Address | Description |
+|---------------|---------------|---------------|---------------|---------------|
 | Ponce | South | Hard |  | **City** Historic architecture; Castillo Serrallés; Caja de Muertos island. |
 | La Guardarraya | South | Hard | Rt 127 Km 6.0 (Yauco) | **Restaurant** Famous *chuletas Kan-Kan* (deep-fried pork chops). |
 | La Fonda de Angelo | South | Hard | Calle Betances #6, Santa Isabel | **Restaurant** Traditional PR food; daily specials. |
 
 ## INTERIOR (MOUNTAIN REGION)
 
+| Place | Area | Difficulty | Address | Description |
+|---------------|---------------|---------------|---------------|---------------|
 | Lechonera Los Pinos | NorthEast / Cayey (Guavate) | Hard | PR-184 | **Food (Favorite)** Some of PR's best roast pork. |
 | Toro Verde (Toroverde) | Orocovis | Hard | Toroverde Adventure Park | **Zipline (Favorite)** One of the longest in the world. |
 | Charco Azul | Carite Forest | Medium |  | **Swimming hole (Favorite)** Beautiful blue pool; nearby Tres Chorros is harder but stunning. |

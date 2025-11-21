@@ -6,7 +6,7 @@ This website lets you search for recommendations by topic:
 
 ------------------------------------------------------------------------
 
-## OLD SAN JUAN
+ ### OLD SAN JUAN
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -22,7 +22,7 @@ This website lets you search for recommendations by topic:
 | La Ocho / Escambrón | Old San Juan | Medium | Near Caribe Hilton | **Beach (Favorite)** Best metro-area snorkeling. Surfing nearby. |
 | Parque de las Palomas | Old San Juan | Hard | End of Calle del Cristo | **Avoid** Aggressive pigeons; not recommended. |
 
-## SAN JUAN (CONDADO, SANTURCE, MIRAMAR, ISLA VERDE)
+ ### SAN JUAN (CONDADO, SANTURCE, MIRAMAR, ISLA VERDE)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -38,7 +38,7 @@ This website lets you search for recommendations by topic:
 | La Casita Blanca | San Juan | Hard | 351 Tapia St | **Restaurant** Traditional PR food; rustic setting in Santurce. |
 | Ponce de León Avenue | San Juan | Hard | Ponce de León Ave | **Urban Corridor** Walk/bike/bus to see the “real” San Juan: Miramar → Santurce → Hato Rey → Río Piedras. |
 
-## NORTHEAST (FAJARDO, LUQUILLO, EL YUNQUE, RIO GRANDE)
+ ### NORTHEAST (FAJARDO, LUQUILLO, EL YUNQUE, RIO GRANDE)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -49,14 +49,14 @@ This website lets you search for recommendations by topic:
 | Vacia Talega | NorthEast | Hard | Route 187 | **Beach** Best beach in metro area; hard to find; great *arepas con bacalao*. |
 | Lechonera Los Pinos | NorthEast / Cayey (Guavate) | Hard | PR-184 | **Food (Favorite)** Some of PR's best roast pork. |
 
-### CULEBRA & VIEQUES (ISLAND MUNICIPALITIES) ---
+ ### CULEBRA & VIEQUES (ISLAND MUNICIPALITIES) 
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
 | Culebra | NorthEast | Hard | Ferry or small plane | **Island (Favorite)** Flamenco Beach: top-10 in the world; crystal water. |
 | Vieques | NorthEast | Hard | Ferry or small plane | **Island** Pristine beaches + world's brightest bioluminescent bay. |
 
-## NORTH (ARECIBO, CAMUY)
+ ### NORTH (ARECIBO, CAMUY)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -64,7 +64,7 @@ This website lets you search for recommendations by topic:
 | Arecibo Observatory | North | Medium |  | Former radiotelescope. Now a museum. |
 | El Buen Café | West | Medium | Carretera 2 381 km 84 Hatillo, Puerto Rico 00659 | Right on the road when you are headed west. |
 
-## WEST (RINCÓN, AGUADILLA, ISABELA)
+ ### WEST (RINCÓN, AGUADILLA, ISABELA)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -72,14 +72,14 @@ This website lets you search for recommendations by topic:
 | Rincón | West | Hard |  | **Surf Town (Favorite)** Best surfing in PR; Steps Beach; trips to Desecheo for world-class snorkeling. |
 | Taino Divers | Hard | Rincón | 564 Black Eagle Rd, Rincón, 00677, Puerto Rico | **Scuba & Snorkel Operator (Favorite)** Runs trips to **Desecheo Island**, one of the best snorkel/scuba spots in Puerto Rico; also offers local boat charters. |
 
-## SOUTHWEST (CABO ROJO, GUÁNICA)
+ ### SOUTHWEST (CABO ROJO, GUÁNICA)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
 | Cabo Rojo & Guánica Beaches | SouthWest | Hard |  | **Beaches (Favorite)** Boquerón, Ballenas, Gilligan's Island, Combate, Playa Sucia, etc. Dry forest + seafood in Joyuda. |
 | Southwest Beaches (original) | SouthWest | Hard |  | **Beaches** Playa Sucia, Boquerón, Buyé, Combate, Gilligan's Island, and more. |
 
-## SOUTH (PONCE, YAÚCO, SANTA ISABEL)
+ ### SOUTH (PONCE, YAÚCO, SANTA ISABEL)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
@@ -87,7 +87,7 @@ This website lets you search for recommendations by topic:
 | La Guardarraya | South | Hard | Rt 127 Km 6.0 (Yauco) | **Restaurant** Famous *chuletas Kan-Kan* (deep-fried pork chops). |
 | La Fonda de Angelo | South | Hard | Calle Betances #6, Santa Isabel | **Restaurant** Traditional PR food; daily specials. |
 
-## INTERIOR (MOUNTAIN REGION)
+ ### INTERIOR (MOUNTAIN REGION)
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|

@@ -10,14 +10,14 @@ This website lets you search for recommendations by topic:
 
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
-| Old San Juan | Old San Juan | Easy |  | **Walking around** A compact, historic area that is great for exploring on foot. |
+| El Morro | Old San Juan | Easy | NW Corner | **Historic Site (Favorite)** 16th-century Spanish fort; must-see. |
 | Deaverdura | Old San Juan | Easy |  | **Restaurant (Favorite)** Local authentic Puerto Rican food. Very popular. |
-| Aqui Se Puede | Old San Juan | Easy | 50 Calle San Justo | **Bar** Good music; located on lively Calle San Sebastián. |
-| Fonda del Jibarito | Old San Juan | Easy | 280 Calle Sol | **Restaurant** Best-value Puerto Rican food in OSJ. |
-| South Fortaleza (SoFo) | Old San Juan | Easy | Calle Fortaleza | **Restaurants** Trendy dining district; Dragon Fly = Asian–Latin fusion. |
-| El Morro | Old San Juan | Easy | NW Corner | **Historic Site (Favorite) ** 16th-century Spanish fort; must-see. |
-| Paseo de la Princesa | Old San Juan | Easy | End of Recinto Sur | **Promenade** See La Fortaleza, Puerta de San Juan, and street cats. |
 | La Ocho / Escambrón | Old San Juan | Medium | Near Caribe Hilton | **Beach (Favorite)** Best metro-area snorkeling. Surfing nearby. |
+| Old San Juan | Old San Juan | Easy |  | **Walking around** A compact, historic area that is great for exploring on foot. |
+| Aqui Se Puede | Old San Juan | Easy | 50 Calle San Justo | **Bar** Good music; located on lively Calle San Sebastián. |
+| Fonda del Jibarito | Old San Juan | Easy | 280 Calle Sol | **Restaurant** Decent Puerto Rican food in quaint setting.|
+| South Fortaleza (SoFo) | Old San Juan | Easy | Calle Fortaleza | **Restaurants** Trendy dining district; Dragon Fly = Asian–Latin fusion. |
+| Paseo de la Princesa | Old San Juan | Easy | End of Recinto Sur | **Promenade** See La Fortaleza, Puerta de San Juan, and street cats. |
 | Parque de las Palomas | Old San Juan | Hard | End of Calle del Cristo | **Avoid** Aggressive pigeons; not recommended. |
 
  ### SAN JUAN (CONDADO, SANTURCE, MIRAMAR, ISLA VERDE)
@@ -25,8 +25,8 @@ This website lets you search for recommendations by topic:
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
 | Walk Condado ↔ El Morro | San Juan | Easy |  | **Walk/Jog (Favorite)** Scenic 5-mile round trip between Condado beaches and El Morro. |
-| Museo de Arte de Puerto Rico | San Juan | Medium | 299 Ave. De Diego | **Museum** PR's top art museum; beautiful gardens. |
 | Bebo's Café | San Juan | Medium | 1600 Loíza Street | **Restaurant (Favorite)** Delicious, inexpensive Puerto Rican food. |
+| Museo de Arte de Puerto Rico | San Juan | Medium | 299 Ave. De Diego | **Museum** PR's top art museum; beautiful gardens. |
 | Via Apia | San Juan | Medium | Ashford Ave | **Restaurant** Best pizza in PR; great outdoor seating. |
 | Condado | San Juan | Medium | Ashford Ave | **District** Hotels, nightlife, shops; oceanfront vibe. |
 | Ocean Park | San Juan | Medium | McLeary Ave | **Beach** Big sandy beach; LGBTQ-friendly; windsurfing. |
@@ -41,11 +41,10 @@ This website lets you search for recommendations by topic:
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
 | El Yunque Rainforest | NorthEast | Easy | Off Route 3 | **Rainforest (Favorite)** Only tropical rainforest in the US; waterfalls, short hikes. |
-| Luquillo Beach | NorthEast | Medium |  | **Beach** Famous family beach near El Yunque. |
 | Bioluminescent Lagoon (Fajardo) | NorthEast | Medium | Las Croabas | **Adventure (Favorite)** Night kayaking in glowing waters; must-do. |
+| Luquillo Beach | NorthEast | Medium |  | **Beach** Famous family beach near El Yunque. |
 | Kayaking at Las Cabezas | NorthEast | Hard | Las Croabas | **Adventure** Guided nighttime biobay kayaking under the stars. |
 | Vacia Talega | NorthEast | Hard | Route 187 | **Beach** Best beach in metro area; hard to find; great *arepas con bacalao*. |
-| Lechonera Los Pinos | NorthEast / Cayey (Guavate) | Hard | PR-184 | **Food (Favorite)** Some of PR's best roast pork. |
 
  ### CULEBRA & VIEQUES (ISLAND MUNICIPALITIES) 
 
@@ -90,5 +89,7 @@ This website lets you search for recommendations by topic:
 | Place | Area | Difficulty | Address | Description |
 |---------------|---------------|---------------|---------------|---------------|
 | Lechonera Los Pinos | NorthEast / Cayey (Guavate) | Hard | PR-184 | **Food (Favorite)** Some of PR's best roast pork. |
-| Toro Verde (Toroverde) | Orocovis | Hard | Toroverde Adventure Park | **Zipline (Favorite)** One of the longest in the world. |
-| Charco Azul | Carite Forest | Medium |  | **Swimming hole (Favorite)** Beautiful blue pool; nearby Tres Chorros is harder but stunning. |
+| Charco Azul | Carite Forest | Medium |  | **Swimming hole (Favorite)** Beautiful blue pool|
+| Tres Chorros is harder but stunning | Patillas| km 12.3 Carretera 184 | **Swimming hole (Favorite)** Natural pool with natural diving platforms |
+| Toro Verde (Toroverde) | Orocovis | Hard | Toroverde Adventure Park | **Zipline** One of the longest in the world. |
+

@@ -16,7 +16,7 @@ This website lets you search for recommendations by topic:
 | Old San Juan | Old San Juan | Easy |  | **Walking around** A compact, historic area that is great for exploring on foot. |
 | Aqui Se Puede | Old San Juan | Easy | 50 Calle San Justo | **Bar** Good music; located on lively Calle San Sebastián. |
 | Fonda del Jibarito | Old San Juan | Easy | 280 Calle Sol | **Restaurant** Decent Puerto Rican food in quaint setting.|
-| South Fortaleza (SoFo) | Old San Juan | Easy | Calle Fortaleza | **Restaurants** Trendy dining district; Dragon Fly = Asian–Latin fusion. |
+| South Fortaleza (SoFo) | Old San Juan | Easy | Calle Fortaleza | **Restaurants** Trendy dining district|
 | Paseo de la Princesa | Old San Juan | Easy | End of Recinto Sur | **Promenade** See La Fortaleza, Puerta de San Juan, and street cats. |
 | Parque de las Palomas | Old San Juan | Hard | End of Calle del Cristo | **Avoid** Aggressive pigeons; not recommended. |
 
